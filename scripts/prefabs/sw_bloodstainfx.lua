@@ -51,17 +51,18 @@ local function InitEnvelope()
 end
 
 --------------------------------------------------------------------------
-local GLOW_MAX_LIFETIME = 1
+local GLOW_MAX_LIFETIME = 10
 
 -- 粒子触发器里第三个参数fn里调用的方法，展示粒子大小，方向，速度，生命周期等等信息
 local function emit_glow_fn(effect, emitter_fn)
-    local vx, vy, vz = .005 * UnitRand(), 0, .005 * UnitRand()
+    -- local vx, vy, vz = .005 * UnitRand(), 0, .005 * UnitRand()
+    local vx, vy, vz = 0, 0, 0
     local lifetime = GLOW_MAX_LIFETIME --* (.9 + math.random() * .1)
     local px, py, pz = emitter_fn()
 
     -- 给x轴一个偏移量
     px = px + math.random(-5, 5) * .2
-     -- 给y轴一个偏移量，测试发现y轴才是高度轴
+    -- 给y轴一个偏移量，测试发现y轴才是高度轴
     -- py = py + 3.2
     -- 给z轴一个偏移量。给坐标偏移量是为了让出现的心不会在一块挤着
     pz = pz + math.random(-5, 5) * .2
@@ -91,6 +92,7 @@ local function fn()
 
     inst.entity:SetPristine()
 
+    -- 貌似此值用于控制prefab的是否出现
     inst.persists = false
 
     --Dedicated server does not need to spawn local particle fx
@@ -98,7 +100,7 @@ local function fn()
         return inst
     elseif InitEnvelope ~= nil then
         -- 初始化颜色和形状变化的设置
-        InitEnvelope() 
+        InitEnvelope()
     end
 
     -- 给prefab添加粒子特效
@@ -132,16 +134,15 @@ local function fn()
 
     local glow_desired_pps = 3
     local glow_particles_per_tick = glow_desired_pps * tick_time
+    -- 粒子数量
     local glow_num_particles_to_emit = 0
 
     local sphere_emitter = CreateSphereEmitter(.03)
     -- 添加粒子触发器，第三个参数是个fn，在 emitters.lua 里会被PostUpdate()重复调用
-    EmitterManager:AddEmitter(inst, nil, function()
-        while glow_num_particles_to_emit > 1 do
-            emit_glow_fn(effect, sphere_emitter)
-            glow_num_particles_to_emit = glow_num_particles_to_emit - 1
-        end
-        glow_num_particles_to_emit = glow_num_particles_to_emit + glow_particles_per_tick * math.random() * 3
+    EmitterManager:AddEmitter(inst, GLOW_MAX_LIFETIME, function()
+        emit_glow_fn(effect, sphere_emitter)
+        glow_num_particles_to_emit = glow_num_particles_to_emit - 1
+        -- glow_num_particles_to_emit = glow_num_particles_to_emit + glow_particles_per_tick * math.random() * 3
     end)
 
     return inst

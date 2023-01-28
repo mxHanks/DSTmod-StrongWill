@@ -18,13 +18,13 @@ AddPlayerPostInit(function(inst)
                     -- 人物当前位置
                     local fx = SpawnPrefab("sw_bloodstainfx")
                     -- fx.entity:SetParent(inst.entity)
-                    local x,y,z = inst:GetPosition():Get()
-                    fx.Transform:SetPosition(x,y,z)
+                    local x, y, z = inst:GetPosition():Get()
+                    fx.Transform:SetPosition(x, y, z)
                 end
                 if data.oldpercent - data.newpercent > 0.1 then
                     -- 开始流血效果
                     if inst.components.debuffable then
-                        -- inst.components.debuffable:AddDebuff("sw_bleedingbuff", "sw_bleedingbuff")
+                        inst.components.debuffable:AddDebuff("sw_bleedingbuff", "sw_bleedingbuff")
                         print("AddDebuff sw_bleedingbuff")
                     end
                 end
@@ -51,3 +51,4 @@ AddPrefabPostInitAny(function(inst)
         end
     end
 end)
+-- TODO 让血迹能很久再消失
